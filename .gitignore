@@ -5,6 +5,9 @@ course-info.yaml
 course-remote-info.yaml
 requirements.txt
 
+# PyCharm files
+.idea
+
 # Include these files
-!Dominoes/task/dominoes
+!Dominoes/task/dominoes/dominoes.py
 
