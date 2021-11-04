@@ -7,6 +7,7 @@ import random
 @dataclass
 class Dominoes:
     # Dominoes game elements
+    complete_set: list = field(default_factory=list)
     all_pieces: list = field(default_factory=list)
     stock_pieces: list = field(default_factory=list)
     computer_pieces: list = field(default_factory=list)
@@ -20,24 +21,22 @@ class Dominoes:
     player_pieces_amount: int = field(default=7)
 
     def __post_init__(self):
+        self.create_pieces()
         self.shuffle_pieces()
         self.starting_piece()
 
     def shuffle_pieces(self, mode="all"):
         if mode == "all":
-            self.all_pieces = self.create_pieces()
+            self.all_pieces = self.complete_set.copy()
             self.assign_pieces(self.stock_pieces, self.stock_pieces_amount)
             self.assign_pieces(self.computer_pieces, self.computer_pieces_amount)
             self.assign_pieces(self.player_pieces, self.player_pieces_amount)
 
-    @staticmethod
-    def create_pieces() -> list:
-        complete_set = []
+    def create_pieces(self):
         for i in range(7):
             for j in range(7):
-                if [j, i] not in complete_set:
-                    complete_set.append([i, j])
-        return complete_set
+                if [j, i] not in self.complete_set:
+                    self.complete_set.append([i, j])
 
     def assign_pieces(self, location, number):
         random.seed()
