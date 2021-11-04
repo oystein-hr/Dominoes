@@ -11,7 +11,7 @@ class Dominoes:
     computer_pieces: list = field(default_factory=list)
     player_pieces: list = field(default_factory=list)
     domino_snake: list = field(default_factory=list)
-    status: str = ""
+    status: str = field(default=str)
 
     stock_pieces_amount = 14
     computer_pieces_amount = 7
