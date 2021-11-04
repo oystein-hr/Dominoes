@@ -6,6 +6,7 @@ import random
 # Create dominoes dataclass
 @dataclass
 class Dominoes:
+    # Dominoes game elements
     all_pieces: list = field(default_factory=list)
     stock_pieces: list = field(default_factory=list)
     computer_pieces: list = field(default_factory=list)
@@ -13,19 +14,21 @@ class Dominoes:
     domino_snake: list = field(default_factory=list)
     status: str = field(default=str)
 
-    stock_pieces_amount = 14
-    computer_pieces_amount = 7
-    player_pieces_amount = 7
+    # Starting amount of pieces
+    stock_pieces_amount: int = field(default=14)
+    computer_pieces_amount: int = field(default=7)
+    player_pieces_amount: int = field(default=7)
 
     def __post_init__(self):
         self.shuffle_pieces()
         self.starting_piece()
 
-    def shuffle_pieces(self):
-        self.all_pieces = self.create_pieces()
-        self.assign_pieces(self.stock_pieces, self.stock_pieces_amount)
-        self.assign_pieces(self.computer_pieces, self.computer_pieces_amount)
-        self.assign_pieces(self.player_pieces, self.player_pieces_amount)
+    def shuffle_pieces(self, mode="all"):
+        if mode == "all":
+            self.all_pieces = self.create_pieces()
+            self.assign_pieces(self.stock_pieces, self.stock_pieces_amount)
+            self.assign_pieces(self.computer_pieces, self.computer_pieces_amount)
+            self.assign_pieces(self.player_pieces, self.player_pieces_amount)
 
     @staticmethod
     def create_pieces() -> list:
@@ -81,9 +84,11 @@ class Dominoes:
                 if self.status == "player":
                     self.domino_snake.append(max(computer_doubles))
                     self.computer_pieces.remove(max(computer_doubles))
+                    self.computer_pieces_amount -= 1
                 else:
                     self.domino_snake.append(max(player_doubles))
                     self.player_pieces.remove(max(player_doubles))
+                    self.player_pieces_amount -= 1
 
                 # Double has been determined, exiting the loop
                 break
