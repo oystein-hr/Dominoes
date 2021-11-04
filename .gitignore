@@ -1,0 +1,10 @@
+# JetBrains Academy files
+Dominoes
+Topics
+course-info.yaml
+course-remote-info.yaml
+requirements.txt
+
+# Include these files
+!Dominoes/task/dominoes
+
