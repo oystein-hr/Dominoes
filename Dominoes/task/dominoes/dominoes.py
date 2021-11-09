@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import random
 
 # Test
+# Test 2
 
 # Create dominoes dataclass
 @dataclass
