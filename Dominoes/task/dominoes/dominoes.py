@@ -81,11 +81,11 @@ class Dominoes:
                 # who had the highest double, and remove the highest
                 # double from the one who had it.
                 if self.status == "player":
-                    self.domino_snake = (max(computer_doubles))
+                    self.domino_snake.append(max(computer_doubles))
                     self.computer_pieces.remove(max(computer_doubles))
                     self.computer_pieces_amount -= 1
                 else:
-                    self.domino_snake = (max(player_doubles))
+                    self.domino_snake.append(max(player_doubles))
                     self.player_pieces.remove(max(player_doubles))
                     self.player_pieces_amount -= 1
 
@@ -100,7 +100,23 @@ def user_interface(data: Dominoes):
     print(f"Stock pieces: {data.stock_pieces_amount}")
     print(f"Computer pieces: {data.computer_pieces_amount}")
     print(empty_line)
-    print(data.domino_snake)
+
+    if len(data.domino_snake) <= 6:
+        for piece in data.domino_snake:
+            print(piece, end='')
+    else:
+        first_part = data.domino_snake[:3]
+        second_part = data.domino_snake[-3:]
+
+        for piece in first_part:
+            print(piece, end='')
+
+        print("...", end='')
+
+        for piece in second_part:
+            print(piece, end='')
+
+    print(empty_line)
     print(empty_line)
     print("Your pieces:")
 
@@ -108,16 +124,61 @@ def user_interface(data: Dominoes):
         print(f"{i+1}: {piece}")
 
     print(empty_line)
-    if data.status == "player":
-        print("Status: It's your turn to make a move. Enter your command.")
+
+
+def take_turn(data: Dominoes, participant, move):
+    if participant == "player":
+        piece = data.player_pieces
     else:
-        print("Status: Computer is about to make a move. Press Enter to continue...")
+        piece = data.computer_pieces
+
+    if move == 0:
+        piece.append(data.stock_pieces.pop())
+    elif move < 0:
+        data.domino_snake.insert(0, piece.pop(abs(move) - 1))
+    else:
+        data.domino_snake.append(piece.pop(move - 1))
+
+    data.player_pieces_amount = len(data.player_pieces)
+    data.computer_pieces_amount = len(data.computer_pieces)
+    data.stock_pieces_amount = len(data.stock_pieces)
 
 
 def main():
     # Create dataclass with variables
     dominoes = Dominoes()
-    user_interface(dominoes)
+
+    while True:
+        user_interface(dominoes)
+
+        if dominoes.player_pieces_amount == 0:
+            print("Status: The game is over. You won!")
+            break
+        elif dominoes.computer_pieces_amount == 0:
+            print("Status: The game is over. The computer won!")
+            break
+
+        # To be added, draw condition with following output:
+        # Status: The game is over. It's a draw!
+
+        if dominoes.status == "player":
+            print("Status: It's your turn to make a move. Enter your command.")
+
+            try:
+                user_action = int(input())
+                assert abs(user_action) <= dominoes.player_pieces_amount
+            except (ValueError, AssertionError):
+                print("Invalid input. Please try again.")
+                continue
+
+            take_turn(dominoes, "player", user_action)
+            dominoes.status = "computer"
+        else:
+            input("Status: Computer is about to make a move. Press Enter to continue...")
+            computer_action = random.randint(-dominoes.computer_pieces_amount, dominoes.computer_pieces_amount)
+
+            take_turn(dominoes, "computer", computer_action)
+            dominoes.status = "player"
 
 
 if __name__ == '__main__':
