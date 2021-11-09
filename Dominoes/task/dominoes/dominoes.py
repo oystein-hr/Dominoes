@@ -81,11 +81,11 @@ class Dominoes:
                 # who had the highest double, and remove the highest
                 # double from the one who had it.
                 if self.status == "player":
-                    self.domino_snake.append(max(computer_doubles))
+                    self.domino_snake = (max(computer_doubles))
                     self.computer_pieces.remove(max(computer_doubles))
                     self.computer_pieces_amount -= 1
                 else:
-                    self.domino_snake.append(max(player_doubles))
+                    self.domino_snake = (max(player_doubles))
                     self.player_pieces.remove(max(player_doubles))
                     self.player_pieces_amount -= 1
 
@@ -93,15 +93,31 @@ class Dominoes:
                 break
 
 
+def user_interface(data: Dominoes):
+    header = "=" * 70
+    empty_line = ""
+    print(header)
+    print(f"Stock pieces: {data.stock_pieces_amount}")
+    print(f"Computer pieces: {data.computer_pieces_amount}")
+    print(empty_line)
+    print(data.domino_snake)
+    print(empty_line)
+    print("Your pieces:")
+
+    for i, piece in enumerate(data.player_pieces):
+        print(f"{i+1}: {piece}")
+
+    print(empty_line)
+    if data.status == "player":
+        print("Status: It's your turn to make a move. Enter your command.")
+    else:
+        print("Status: Computer is about to make a move. Press Enter to continue...")
+
+
 def main():
     # Create dataclass with variables
     dominoes = Dominoes()
-
-    print(f"Stock pieces: {dominoes.stock_pieces}")
-    print(f"Computer pieces: {dominoes.computer_pieces}")
-    print(f"Player pieces: {dominoes.player_pieces}")
-    print(f"Domino snake: {dominoes.domino_snake}")
-    print(f"Status: {dominoes.status}")
+    user_interface(dominoes)
 
 
 if __name__ == '__main__':
