@@ -126,22 +126,85 @@ def user_interface(data: Dominoes):
     print(empty_line)
 
 
-def take_turn(data: Dominoes, participant, move):
-    if participant == "player":
-        piece = data.player_pieces
+def take_turn(data: Dominoes, move):
+    # Get pieces from player or computer
+    if data.status == "player":
+        pieces = data.player_pieces
     else:
-        piece = data.computer_pieces
+        pieces = data.computer_pieces
 
+    # Make index for chosen piece
+    # and retrive selected piece
+    piece_index = abs(move) - 1
+    selected_piece = pieces[piece_index]
+
+    # Action depending on user input
     if move == 0:
-        piece.append(data.stock_pieces.pop())
+        pieces.append(data.stock_pieces.pop())
     elif move < 0:
-        data.domino_snake.insert(0, piece.pop(abs(move) - 1))
+        if data.domino_snake[0][0] != selected_piece[1]:
+            pieces[piece_index] = selected_piece[::-1]
+        data.domino_snake.insert(0, pieces.pop(piece_index))
     else:
-        data.domino_snake.append(piece.pop(move - 1))
+        if data.domino_snake[-1][1] != selected_piece[0]:
+            pieces[piece_index] = selected_piece[::-1]
+        data.domino_snake.append(pieces.pop(piece_index))
 
     data.player_pieces_amount = len(data.player_pieces)
     data.computer_pieces_amount = len(data.computer_pieces)
     data.stock_pieces_amount = len(data.stock_pieces)
+
+
+def valid_move(data: Dominoes, move) -> bool:
+    if move == 0:
+        return True
+
+    if data.status == "computer":
+        piece = data.computer_pieces[abs(move) - 1]
+    else:
+        piece = data.player_pieces[abs(move) - 1]
+
+    left_side = data.domino_snake[0]
+    right_side = data.domino_snake[-1]
+
+    if left_side[0] in piece and move < 0:
+        return True
+    elif right_side[1] in piece and move > 0:
+        return True
+    else:
+        return False
+
+
+def get_action(data: Dominoes) -> int:
+    if data.status == "player":
+        pieces_amount = data.player_pieces_amount
+    else:
+        pieces_amount = data.computer_pieces_amount
+
+    while True:
+        # Check if user input is valid
+        try:
+            if data.status == "player":
+                action = int(input())
+            else:
+                action = random.randint(-pieces_amount, pieces_amount)
+            assert abs(action) <= pieces_amount
+        except (ValueError, AssertionError):
+            if data.status == "player":
+                print("Invalid input. Please try again.")
+            continue
+
+        # Check if move is valid
+        try:
+            assert valid_move(data, action)
+        except AssertionError:
+            if data.status == "player":
+                print("Illegal move. Please try again.")
+            continue
+        else:
+            break
+
+    return action
 
 
 def main():
@@ -157,6 +220,9 @@ def main():
         elif dominoes.computer_pieces_amount == 0:
             print("Status: The game is over. The computer won!")
             break
+        elif dominoes.stock_pieces_amount == 0:
+            print("Status: The game is over. It's a draw!")
+            exit()
 
         # To be added, draw condition with following output:
         # Status: The game is over. It's a draw!
@@ -164,20 +230,12 @@ def main():
         if dominoes.status == "player":
             print("Status: It's your turn to make a move. Enter your command.")
 
-            try:
-                user_action = int(input())
-                assert abs(user_action) <= dominoes.player_pieces_amount
-            except (ValueError, AssertionError):
-                print("Invalid input. Please try again.")
-                continue
-
-            take_turn(dominoes, "player", user_action)
+            take_turn(dominoes, get_action(dominoes))
             dominoes.status = "computer"
         else:
             input("Status: Computer is about to make a move. Press Enter to continue...")
-            computer_action = random.randint(-dominoes.computer_pieces_amount, dominoes.computer_pieces_amount)
 
-            take_turn(dominoes, "computer", computer_action)
+            take_turn(dominoes, get_action(dominoes))
             dominoes.status = "player"
 
 
