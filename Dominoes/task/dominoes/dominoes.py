@@ -24,6 +24,8 @@ class Dominoes:
         self.create_pieces()
         self.shuffle_pieces()
         self.starting_piece()
+        # self.ai_set_values()
+        # print(self.computer_values)
 
     def shuffle_pieces(self, mode="all"):
         if mode == "all":
@@ -155,6 +157,31 @@ def take_turn(data: Dominoes, move):
     data.stock_pieces_amount = len(data.stock_pieces)
 
 
+def computer_turn(data: Dominoes):
+    value_count = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+    snake_computer_pieces = data.computer_pieces[::] + data.domino_snake[::]
+    for domino in snake_computer_pieces:
+        value_count[domino[0]] += 1
+        value_count[domino[1]] += 1
+
+    domino_scores = {}
+
+    for domino in data.computer_pieces:
+        score = value_count[domino[0]] + value_count[domino[1]]
+        domino_scores.setdefault(score, []).append(domino)
+
+    while True:
+        highest_score = domino_scores.pop([max(domino_scores.keys())][0]).pop()
+        idx = data.computer_pieces.index(highest_score)
+        if valid_move(data, idx):
+            return idx
+        else:
+            if len(domino_scores) > 0:
+                continue
+            else:
+                return 0
+
+
 def valid_move(data: Dominoes, move) -> bool:
     if move == 0:
         return True
@@ -187,7 +214,7 @@ def get_action(data: Dominoes) -> int:
             if data.status == "player":
                 action = int(input())
             else:
-                action = random.randint(-pieces_amount, pieces_amount)
+                action = computer_turn(data)
             assert abs(action) <= pieces_amount
         except (ValueError, AssertionError):
             if data.status == "player":
